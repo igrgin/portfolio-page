@@ -1,14 +1,16 @@
-import type { ComponentType, ReactNode } from 'react'
+import { useMemo, useState, type ComponentType, type ReactNode } from 'react'
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import {
   BriefcaseBusiness,
   Code2,
   ExternalLink,
+  Filter,
   Github,
   GraduationCap,
   Linkedin,
   Mail,
   MoonStar,
+  Search,
   Server,
   Wrench
 } from 'lucide-react'
@@ -25,14 +27,11 @@ type StackItem = {
   usedOn: string[]
 }
 type Accent = 'cyan' | 'violet' | 'emerald' | 'rose' | 'indigo'
+type ProficiencyFilter = 'All' | StackItem['proficiency']
+type Filters = { query: string; proficiency: ProficiencyFilter }
 
 const accentStyles: Record<Accent, { icon: string; border: string; soft: string; action: string }> = {
-  cyan: {
-    icon: 'text-cyan-300',
-    border: 'border-cyan-900/70',
-    soft: 'bg-cyan-950/25',
-    action: 'border-cyan-800 text-cyan-300'
-  },
+  cyan: { icon: 'text-cyan-300', border: 'border-cyan-900/70', soft: 'bg-cyan-950/25', action: 'border-cyan-800 text-cyan-300' },
   violet: {
     icon: 'text-violet-300',
     border: 'border-violet-900/70',
@@ -45,12 +44,7 @@ const accentStyles: Record<Accent, { icon: string; border: string; soft: string;
     soft: 'bg-emerald-950/25',
     action: 'border-emerald-800 text-emerald-300'
   },
-  rose: {
-    icon: 'text-rose-300',
-    border: 'border-rose-900/70',
-    soft: 'bg-rose-950/25',
-    action: 'border-rose-800 text-rose-300'
-  },
+  rose: { icon: 'text-rose-300', border: 'border-rose-900/70', soft: 'bg-rose-950/25', action: 'border-rose-800 text-rose-300' },
   indigo: {
     icon: 'text-indigo-300',
     border: 'border-indigo-900/70',
@@ -122,6 +116,10 @@ const profile = {
   ] as Project[]
 }
 
+function includesQuery(haystack: string, query: string) {
+  return haystack.toLowerCase().includes(query.toLowerCase())
+}
+
 function SectionTitle({ icon: Icon, children, accent }: { icon: ComponentType<{ className?: string }>; children: string; accent: Accent }) {
   return (
     <h2 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-slate-100">
@@ -150,53 +148,106 @@ function DesignSwitcher() {
   )
 }
 
-function EducationSection({ accent }: { accent: Accent }) {
+function FiltersBar({ accent, filters, setFilters }: { accent: Accent; filters: Filters; setFilters: (f: Filters) => void }) {
+  return (
+    <div className={`mt-5 grid gap-3 rounded-xl border p-4 md:grid-cols-[1fr_auto] ${accentStyles[accent].border} ${accentStyles[accent].soft}`}>
+      <label className="flex items-center gap-2 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-300">
+        <Search className="h-4 w-4" />
+        <input
+          value={filters.query}
+          onChange={(e) => setFilters({ ...filters, query: e.target.value })}
+          placeholder="Filter education, experience, tech stack, projects..."
+          className="w-full bg-transparent outline-none placeholder:text-slate-500"
+        />
+      </label>
+      <label className="flex items-center gap-2 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-300">
+        <Filter className="h-4 w-4" />
+        <select
+          value={filters.proficiency}
+          onChange={(e) => setFilters({ ...filters, proficiency: e.target.value as ProficiencyFilter })}
+          className="bg-transparent outline-none"
+        >
+          <option value="All">All proficiency</option>
+          <option value="Beginner">Beginner</option>
+          <option value="Intermediate">Intermediate</option>
+          <option value="Advanced">Advanced</option>
+          <option value="Expert">Expert</option>
+        </select>
+      </label>
+    </div>
+  )
+}
+
+function EducationSection({ accent, filters }: { accent: Accent; filters: Filters }) {
+  const items = useMemo(
+    () =>
+      profile.education.filter((item) => includesQuery(`${item.degree} ${item.school} ${item.period}`, filters.query)),
+    [filters.query]
+  )
+
   return (
     <section>
       <SectionTitle icon={GraduationCap} accent={accent}>Education</SectionTitle>
       <div className="mt-3 space-y-3">
-        {profile.education.map((item) => (
+        {items.map((item) => (
           <div key={item.degree} className={`rounded-lg border bg-slate-900 p-3 ${accentStyles[accent].border}`}>
             <p className="font-medium text-slate-100">{item.degree}</p>
             <p className="text-sm text-slate-400">{item.school}</p>
             <p className="text-xs text-slate-500">{item.period}</p>
           </div>
         ))}
+        {!items.length && <p className="text-sm text-slate-500">No education entries match the current filters.</p>}
       </div>
     </section>
   )
 }
 
-function ExperienceSection({ accent }: { accent: Accent }) {
+function ExperienceSection({ accent, filters }: { accent: Accent; filters: Filters }) {
+  const items = useMemo(
+    () =>
+      profile.experience.filter((item) => includesQuery(`${item.title} ${item.company} ${item.period} ${item.summary}`, filters.query)),
+    [filters.query]
+  )
+
   return (
     <section>
       <SectionTitle icon={BriefcaseBusiness} accent={accent}>Experience</SectionTitle>
       <div className="mt-3 space-y-3">
-        {profile.experience.map((item) => (
+        {items.map((item) => (
           <div key={item.company + item.title} className={`rounded-lg border bg-slate-900 p-3 ${accentStyles[accent].border}`}>
             <p className="font-medium text-slate-100">{item.title} · {item.company}</p>
             <p className="text-xs text-slate-500">{item.period}</p>
             <p className="text-sm text-slate-300">{item.summary}</p>
           </div>
         ))}
+        {!items.length && <p className="text-sm text-slate-500">No experience entries match the current filters.</p>}
       </div>
     </section>
   )
 }
 
-function TechSection({ accent }: { accent: Accent }) {
+function TechSection({ accent, filters }: { accent: Accent; filters: Filters }) {
   const proficiencyStyles: Record<StackItem['proficiency'], string> = {
     Beginner: 'text-amber-300 border-amber-900/60 bg-amber-950/40',
     Intermediate: 'text-sky-300 border-sky-900/60 bg-sky-950/40',
     Advanced: 'text-indigo-300 border-indigo-900/60 bg-indigo-950/40',
     Expert: 'text-emerald-300 border-emerald-900/60 bg-emerald-950/40'
   }
+  const items = useMemo(
+    () =>
+      profile.stack.filter((item) => {
+        const matchesQuery = includesQuery(`${item.name} ${item.proficiency} ${item.usedOn.join(' ')}`, filters.query)
+        const matchesProficiency = filters.proficiency === 'All' || item.proficiency === filters.proficiency
+        return matchesQuery && matchesProficiency
+      }),
+    [filters.proficiency, filters.query]
+  )
 
   return (
     <section>
       <SectionTitle icon={Wrench} accent={accent}>Tech Stack</SectionTitle>
       <div className="mt-3 grid gap-3 md:grid-cols-2">
-        {profile.stack.map((tech) => (
+        {items.map((tech) => (
           <div key={tech.name} className={`rounded-lg border bg-slate-900 p-3 ${accentStyles[accent].border}`}>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="font-medium text-slate-100">{tech.name}</p>
@@ -210,17 +261,26 @@ function TechSection({ accent }: { accent: Accent }) {
             </ul>
           </div>
         ))}
+        {!items.length && <p className="text-sm text-slate-500">No stack entries match the current filters.</p>}
       </div>
     </section>
   )
 }
 
-function ProjectsSection({ accent }: { accent: Accent }) {
+function ProjectsSection({ accent, filters }: { accent: Accent; filters: Filters }) {
+  const items = useMemo(
+    () =>
+      profile.projects.filter((project) =>
+        includesQuery(`${project.name} ${project.stack} ${project.summary} ${project.github} ${project.demo ?? ''}`, filters.query)
+      ),
+    [filters.query]
+  )
+
   return (
     <section>
       <SectionTitle icon={Code2} accent={accent}>Featured Projects</SectionTitle>
       <div className="mt-3 grid gap-3 md:grid-cols-3">
-        {profile.projects.map((project) => (
+        {items.map((project) => (
           <Card key={project.name} className={`border bg-slate-900 text-slate-200 ${accentStyles[accent].border}`}>
             <CardHeader className="pb-2">
               <CardTitle className="text-base text-slate-100">{project.name}</CardTitle>
@@ -241,6 +301,7 @@ function ProjectsSection({ accent }: { accent: Accent }) {
             </CardContent>
           </Card>
         ))}
+        {!items.length && <p className="text-sm text-slate-500">No project entries match the current filters.</p>}
       </div>
     </section>
   )
@@ -282,96 +343,101 @@ function LayoutPanel({ children, accent }: { children: ReactNode; accent: Accent
   return <div className={`rounded-xl border p-4 md:p-5 ${accentStyles[accent].border} ${accentStyles[accent].soft}`}>{children}</div>
 }
 
-function DesignOne() {
+function DesignOne({ filters, setFilters }: { filters: Filters; setFilters: (f: Filters) => void }) {
   const accent: Accent = 'cyan'
   return (
     <Shell>
       <Hero accent={accent} />
+      <FiltersBar accent={accent} filters={filters} setFilters={setFilters} />
       <div className="mt-6 grid gap-6 md:grid-cols-2">
-        <EducationSection accent={accent} />
-        <ExperienceSection accent={accent} />
+        <EducationSection accent={accent} filters={filters} />
+        <ExperienceSection accent={accent} filters={filters} />
       </div>
       <div className="mt-6 space-y-6">
-        <TechSection accent={accent} />
-        <ProjectsSection accent={accent} />
+        <TechSection accent={accent} filters={filters} />
+        <ProjectsSection accent={accent} filters={filters} />
       </div>
     </Shell>
   )
 }
 
-function DesignTwo() {
+function DesignTwo({ filters, setFilters }: { filters: Filters; setFilters: (f: Filters) => void }) {
   const accent: Accent = 'violet'
   return (
     <Shell>
       <Hero accent={accent} />
+      <FiltersBar accent={accent} filters={filters} setFilters={setFilters} />
       <div className="mt-6 grid gap-4 md:grid-cols-12">
-        <div className="md:col-span-4"><EducationSection accent={accent} /></div>
-        <div className="md:col-span-8"><ExperienceSection accent={accent} /></div>
-        <div className="md:col-span-12"><TechSection accent={accent} /></div>
-        <div className="md:col-span-12"><ProjectsSection accent={accent} /></div>
+        <div className="md:col-span-4"><EducationSection accent={accent} filters={filters} /></div>
+        <div className="md:col-span-8"><ExperienceSection accent={accent} filters={filters} /></div>
+        <div className="md:col-span-12"><TechSection accent={accent} filters={filters} /></div>
+        <div className="md:col-span-12"><ProjectsSection accent={accent} filters={filters} /></div>
       </div>
     </Shell>
   )
 }
 
-function DesignThree() {
+function DesignThree({ filters, setFilters }: { filters: Filters; setFilters: (f: Filters) => void }) {
   const accent: Accent = 'emerald'
   return (
     <Shell>
       <Hero accent={accent} />
+      <FiltersBar accent={accent} filters={filters} setFilters={setFilters} />
       <div className="mt-6 grid gap-5 md:grid-cols-[1.45fr_1fr]">
-        <LayoutPanel accent={accent}><ExperienceSection accent={accent} /></LayoutPanel>
+        <LayoutPanel accent={accent}><ExperienceSection accent={accent} filters={filters} /></LayoutPanel>
         <div className="space-y-4">
-          <LayoutPanel accent={accent}><EducationSection accent={accent} /></LayoutPanel>
-          <LayoutPanel accent={accent}><TechSection accent={accent} /></LayoutPanel>
+          <LayoutPanel accent={accent}><EducationSection accent={accent} filters={filters} /></LayoutPanel>
+          <LayoutPanel accent={accent}><TechSection accent={accent} filters={filters} /></LayoutPanel>
         </div>
       </div>
-      <div className="mt-6">
-        <LayoutPanel accent={accent}><ProjectsSection accent={accent} /></LayoutPanel>
-      </div>
+      <div className="mt-6"><LayoutPanel accent={accent}><ProjectsSection accent={accent} filters={filters} /></LayoutPanel></div>
     </Shell>
   )
 }
 
-function DesignFour() {
+function DesignFour({ filters, setFilters }: { filters: Filters; setFilters: (f: Filters) => void }) {
   const accent: Accent = 'rose'
   return (
     <Shell>
       <Hero accent={accent} />
+      <FiltersBar accent={accent} filters={filters} setFilters={setFilters} />
       <div className="mt-6 grid gap-5 md:grid-cols-2">
-        <div className="md:col-span-2"><LayoutPanel accent={accent}><ProjectsSection accent={accent} /></LayoutPanel></div>
-        <LayoutPanel accent={accent}><ExperienceSection accent={accent} /></LayoutPanel>
-        <LayoutPanel accent={accent}><EducationSection accent={accent} /></LayoutPanel>
-        <div className="md:col-span-2"><LayoutPanel accent={accent}><TechSection accent={accent} /></LayoutPanel></div>
+        <div className="md:col-span-2"><LayoutPanel accent={accent}><ProjectsSection accent={accent} filters={filters} /></LayoutPanel></div>
+        <LayoutPanel accent={accent}><ExperienceSection accent={accent} filters={filters} /></LayoutPanel>
+        <LayoutPanel accent={accent}><EducationSection accent={accent} filters={filters} /></LayoutPanel>
+        <div className="md:col-span-2"><LayoutPanel accent={accent}><TechSection accent={accent} filters={filters} /></LayoutPanel></div>
       </div>
     </Shell>
   )
 }
 
-function DesignFive() {
+function DesignFive({ filters, setFilters }: { filters: Filters; setFilters: (f: Filters) => void }) {
   const accent: Accent = 'indigo'
   return (
     <Shell>
       <Hero accent={accent} />
+      <FiltersBar accent={accent} filters={filters} setFilters={setFilters} />
       <div className="mt-6 grid gap-5 md:grid-cols-12">
-        <div className="md:col-span-4"><LayoutPanel accent={accent}><EducationSection accent={accent} /></LayoutPanel></div>
-        <div className="md:col-span-8"><LayoutPanel accent={accent}><ExperienceSection accent={accent} /></LayoutPanel></div>
-        <div className="md:col-span-12"><LayoutPanel accent={accent}><TechSection accent={accent} /></LayoutPanel></div>
-        <div className="md:col-span-12"><LayoutPanel accent={accent}><ProjectsSection accent={accent} /></LayoutPanel></div>
+        <div className="md:col-span-4"><LayoutPanel accent={accent}><EducationSection accent={accent} filters={filters} /></LayoutPanel></div>
+        <div className="md:col-span-8"><LayoutPanel accent={accent}><ExperienceSection accent={accent} filters={filters} /></LayoutPanel></div>
+        <div className="md:col-span-12"><LayoutPanel accent={accent}><TechSection accent={accent} filters={filters} /></LayoutPanel></div>
+        <div className="md:col-span-12"><LayoutPanel accent={accent}><ProjectsSection accent={accent} filters={filters} /></LayoutPanel></div>
       </div>
     </Shell>
   )
 }
 
 function DesignPage({ designId }: { designId: 1 | 2 | 3 | 4 | 5 }) {
+  const [filters, setFilters] = useState<Filters>({ query: '', proficiency: 'All' })
+
   return (
     <main className="min-h-screen bg-slate-900 p-6 md:p-10">
       <DesignSwitcher />
-      {designId === 1 && <DesignOne />}
-      {designId === 2 && <DesignTwo />}
-      {designId === 3 && <DesignThree />}
-      {designId === 4 && <DesignFour />}
-      {designId === 5 && <DesignFive />}
+      {designId === 1 && <DesignOne filters={filters} setFilters={setFilters} />}
+      {designId === 2 && <DesignTwo filters={filters} setFilters={setFilters} />}
+      {designId === 3 && <DesignThree filters={filters} setFilters={setFilters} />}
+      {designId === 4 && <DesignFour filters={filters} setFilters={setFilters} />}
+      {designId === 5 && <DesignFive filters={filters} setFilters={setFilters} />}
     </main>
   )
 }
