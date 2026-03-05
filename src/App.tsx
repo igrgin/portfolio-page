@@ -6,6 +6,7 @@ import {
   ExternalLink,
   Github,
   GraduationCap,
+  Linkedin,
   Mail,
   MoonStar,
   Server,
@@ -26,8 +27,8 @@ const profile = {
     'I design resilient backend systems with clear contracts, robust observability, and predictable performance under load.',
   contact: {
     email: 'avery.backend@example.dev',
-    linkedin: 'linkedin.com/in/avery-backend',
-    github: 'github.com/avery-backend'
+    linkedin: 'https://linkedin.com/in/avery-backend',
+    github: 'https://github.com/avery-backend'
   },
   education: [
     { degree: 'MSc Computer Science', school: 'University of Manchester', period: '2019 — 2021' },
@@ -164,11 +165,21 @@ function ProjectsSection() {
               <p className="text-xs text-slate-500">{project.stack}</p>
               <p className="mt-2 text-sm text-slate-300">{project.summary}</p>
               <div className="mt-4 flex gap-2">
-                <a href={project.github} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border border-slate-700 px-2 py-1 text-xs hover:bg-slate-800">
+                <a
+                  href={project.github}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 rounded-md border border-slate-700 px-2 py-1 text-xs hover:bg-slate-800"
+                >
                   <Github className="h-3.5 w-3.5" /> GitHub
                 </a>
                 {project.demo ? (
-                  <a href={project.demo} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border border-cyan-800 px-2 py-1 text-xs text-cyan-300 hover:bg-slate-800">
+                  <a
+                    href={project.demo}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 rounded-md border border-cyan-800 px-2 py-1 text-xs text-cyan-300 hover:bg-slate-800"
+                  >
                     <ExternalLink className="h-3.5 w-3.5" /> Live Demo
                   </a>
                 ) : null}
@@ -176,19 +187,6 @@ function ProjectsSection() {
             </CardContent>
           </Card>
         ))}
-      </div>
-    </section>
-  )
-}
-
-function ContactSection() {
-  return (
-    <section>
-      <SectionTitle icon={Mail}>Contact</SectionTitle>
-      <div className="mt-3 rounded-lg border border-slate-800 bg-slate-900 p-3 text-sm leading-7 text-slate-300">
-        <p>{profile.contact.email}</p>
-        <p>{profile.contact.linkedin}</p>
-        <p>{profile.contact.github}</p>
       </div>
     </section>
   )
@@ -205,32 +203,114 @@ function Hero({ accent = 'cyan' }: { accent?: 'cyan' | 'violet' | 'emerald' | 'r
 
   return (
     <section className={`rounded-2xl border bg-gradient-to-br p-6 ${accents[accent]}`}>
-      <p className="mb-2 flex items-center gap-2 text-sm text-slate-300"><Server className="h-4 w-4" /> Hero / Introduction</p>
+      <p className="mb-2 flex items-center gap-2 text-sm text-slate-300">
+        <Server className="h-4 w-4" /> Hero / Introduction
+      </p>
       <h1 className="text-4xl font-bold text-white">{profile.name}</h1>
       <p className="text-lg text-slate-300">{profile.role}</p>
       <p className="mt-3 max-w-3xl text-slate-300">{profile.intro}</p>
+      <div className="mt-5 flex flex-wrap gap-2">
+        <a
+          href={`mailto:${profile.contact.email}`}
+          className="inline-flex items-center gap-2 rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-800"
+        >
+          <Mail className="h-4 w-4" /> Email
+        </a>
+        <a
+          href={profile.contact.linkedin}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-2 rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-800"
+        >
+          <Linkedin className="h-4 w-4" /> LinkedIn
+        </a>
+        <a
+          href={profile.contact.github}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-2 rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-800"
+        >
+          <Github className="h-4 w-4" /> GitHub
+        </a>
+      </div>
     </section>
   )
 }
 
 function DesignOne() {
-  return <Shell><Hero accent="cyan" /><div className="mt-6 grid gap-6 md:grid-cols-2"><EducationSection /><ExperienceSection /></div><div className="mt-6 space-y-6"><TechSection /><ProjectsSection /><ContactSection /></div></Shell>
+  return (
+    <Shell>
+      <Hero accent="cyan" />
+      <div className="mt-6 grid gap-6 md:grid-cols-2">
+        <EducationSection />
+        <ExperienceSection />
+      </div>
+      <div className="mt-6 space-y-6">
+        <TechSection />
+        <ProjectsSection />
+      </div>
+    </Shell>
+  )
 }
 
 function DesignTwo() {
-  return <Shell><Hero accent="violet" /><div className="mt-6 grid gap-4 md:grid-cols-12"><div className="md:col-span-4"><EducationSection /></div><div className="md:col-span-8"><ExperienceSection /></div><div className="md:col-span-12"><TechSection /></div><div className="md:col-span-12"><ProjectsSection /></div><div className="md:col-span-12"><ContactSection /></div></div></Shell>
+  return (
+    <Shell>
+      <Hero accent="violet" />
+      <div className="mt-6 grid gap-4 md:grid-cols-12">
+        <div className="md:col-span-4"><EducationSection /></div>
+        <div className="md:col-span-8"><ExperienceSection /></div>
+        <div className="md:col-span-12"><TechSection /></div>
+        <div className="md:col-span-12"><ProjectsSection /></div>
+      </div>
+    </Shell>
+  )
 }
 
 function DesignThree() {
-  return <Shell><Hero accent="emerald" /><div className="mt-6 grid gap-4 md:grid-cols-[1.4fr_1fr]"><ExperienceSection /><div className="space-y-4"><EducationSection /><TechSection /></div></div><div className="mt-6 grid gap-4 md:grid-cols-2"><ProjectsSection /><ContactSection /></div></Shell>
+  return (
+    <Shell>
+      <Hero accent="emerald" />
+      <div className="mt-6 grid gap-4 md:grid-cols-[1.4fr_1fr]">
+        <ExperienceSection />
+        <div className="space-y-4">
+          <EducationSection />
+          <TechSection />
+        </div>
+      </div>
+      <div className="mt-6 grid gap-4 md:grid-cols-1">
+        <ProjectsSection />
+      </div>
+    </Shell>
+  )
 }
 
 function DesignFour() {
-  return <Shell><Hero accent="rose" /><div className="mt-6 grid gap-4 md:grid-cols-2"><ProjectsSection /><ExperienceSection /><TechSection /><EducationSection /></div><div className="mt-6"><ContactSection /></div></Shell>
+  return (
+    <Shell>
+      <Hero accent="rose" />
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
+        <ProjectsSection />
+        <ExperienceSection />
+        <TechSection />
+        <EducationSection />
+      </div>
+    </Shell>
+  )
 }
 
 function DesignFive() {
-  return <Shell><Hero accent="indigo" /><div className="mt-6 grid gap-4 md:grid-cols-3"><div className="md:col-span-1"><EducationSection /></div><div className="md:col-span-2"><ExperienceSection /></div><div className="md:col-span-3"><ProjectsSection /></div><div className="md:col-span-2"><TechSection /></div><div className="md:col-span-1"><ContactSection /></div></div></Shell>
+  return (
+    <Shell>
+      <Hero accent="indigo" />
+      <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div className="md:col-span-1"><EducationSection /></div>
+        <div className="md:col-span-2"><ExperienceSection /></div>
+        <div className="md:col-span-3"><ProjectsSection /></div>
+        <div className="md:col-span-3"><TechSection /></div>
+      </div>
+    </Shell>
+  )
 }
 
 function DesignPage({ designId }: { designId: 1 | 2 | 3 | 4 | 5 }) {
