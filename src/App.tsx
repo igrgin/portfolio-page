@@ -268,6 +268,10 @@ function Hero({ accent = 'cyan' }: { accent?: 'cyan' | 'violet' | 'emerald' | 'r
   )
 }
 
+function LayoutPanel({ children }: { children: ReactNode }) {
+  return <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4 md:p-5">{children}</div>
+}
+
 function DesignOne() {
   return (
     <Shell>
@@ -302,15 +306,23 @@ function DesignThree() {
   return (
     <Shell>
       <Hero accent="emerald" />
-      <div className="mt-6 grid gap-4 md:grid-cols-[1.4fr_1fr]">
-        <ExperienceSection />
+      <div className="mt-6 grid gap-5 md:grid-cols-[1.45fr_1fr]">
+        <LayoutPanel>
+          <ExperienceSection />
+        </LayoutPanel>
         <div className="space-y-4">
-          <EducationSection />
-          <TechSection />
+          <LayoutPanel>
+            <EducationSection />
+          </LayoutPanel>
+          <LayoutPanel>
+            <TechSection />
+          </LayoutPanel>
         </div>
       </div>
-      <div className="mt-6 grid gap-4 md:grid-cols-1">
-        <ProjectsSection />
+      <div className="mt-6">
+        <LayoutPanel>
+          <ProjectsSection />
+        </LayoutPanel>
       </div>
     </Shell>
   )
@@ -320,11 +332,23 @@ function DesignFour() {
   return (
     <Shell>
       <Hero accent="rose" />
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <ProjectsSection />
-        <ExperienceSection />
-        <TechSection />
-        <EducationSection />
+      <div className="mt-6 grid gap-5 md:grid-cols-2">
+        <div className="md:col-span-2">
+          <LayoutPanel>
+            <ProjectsSection />
+          </LayoutPanel>
+        </div>
+        <LayoutPanel>
+          <ExperienceSection />
+        </LayoutPanel>
+        <LayoutPanel>
+          <EducationSection />
+        </LayoutPanel>
+        <div className="md:col-span-2">
+          <LayoutPanel>
+            <TechSection />
+          </LayoutPanel>
+        </div>
       </div>
     </Shell>
   )
@@ -334,11 +358,27 @@ function DesignFive() {
   return (
     <Shell>
       <Hero accent="indigo" />
-      <div className="mt-6 grid gap-4 md:grid-cols-3">
-        <div className="md:col-span-1"><EducationSection /></div>
-        <div className="md:col-span-2"><ExperienceSection /></div>
-        <div className="md:col-span-3"><ProjectsSection /></div>
-        <div className="md:col-span-3"><TechSection /></div>
+      <div className="mt-6 grid gap-5 md:grid-cols-12">
+        <div className="md:col-span-4">
+          <LayoutPanel>
+            <EducationSection />
+          </LayoutPanel>
+        </div>
+        <div className="md:col-span-8">
+          <LayoutPanel>
+            <ExperienceSection />
+          </LayoutPanel>
+        </div>
+        <div className="md:col-span-12">
+          <LayoutPanel>
+            <TechSection />
+          </LayoutPanel>
+        </div>
+        <div className="md:col-span-12">
+          <LayoutPanel>
+            <ProjectsSection />
+          </LayoutPanel>
+        </div>
       </div>
     </Shell>
   )
