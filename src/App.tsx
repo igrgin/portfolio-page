@@ -19,6 +19,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 type Education = { degree: string; school: string; period: string }
 type Experience = { title: string; company: string; period: string; summary: string }
 type Project = { name: string; stack: string; summary: string; github: string; demo?: string }
+type StackItem = {
+  name: string
+  proficiency: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
+  usedOn: string[]
+}
 
 const profile = {
   name: 'Avery Thompson',
@@ -48,7 +53,17 @@ const profile = {
       summary: 'Built secure payment processing services handling 12M+ monthly transactions.'
     }
   ] as Experience[],
-  stack: ['Go', 'Node.js', 'Python', 'PostgreSQL', 'Redis', 'Kafka', 'Docker', 'Kubernetes', 'AWS'],
+  stack: [
+    { name: 'Go', proficiency: 'Expert', usedOn: ['LedgerStream (project)', 'Cloudforge Labs (job)'] },
+    { name: 'Node.js', proficiency: 'Advanced', usedOn: ['AuthBridge (project)', 'Finstack Systems (job)'] },
+    { name: 'Python', proficiency: 'Advanced', usedOn: ['OpsPulse (project)', 'Cloudforge Labs (job)'] },
+    { name: 'PostgreSQL', proficiency: 'Expert', usedOn: ['LedgerStream (project)', 'Finstack Systems (job)'] },
+    { name: 'Redis', proficiency: 'Advanced', usedOn: ['AuthBridge (project)', 'Finstack Systems (job)'] },
+    { name: 'Kafka', proficiency: 'Advanced', usedOn: ['LedgerStream (project)', 'Cloudforge Labs (job)'] },
+    { name: 'Docker', proficiency: 'Expert', usedOn: ['All featured projects', 'Cloudforge Labs (job)'] },
+    { name: 'Kubernetes', proficiency: 'Advanced', usedOn: ['Cloudforge Labs (job)', 'OpsPulse (project deployment)'] },
+    { name: 'AWS', proficiency: 'Advanced', usedOn: ['Cloudforge Labs (job)', 'AuthBridge (project deployment)'] }
+  ] as StackItem[],
   projects: [
     {
       name: 'LedgerStream',
@@ -137,14 +152,30 @@ function ExperienceSection() {
 }
 
 function TechSection() {
+  const proficiencyStyles: Record<StackItem['proficiency'], string> = {
+    Beginner: 'text-amber-300 border-amber-900/60 bg-amber-950/40',
+    Intermediate: 'text-sky-300 border-sky-900/60 bg-sky-950/40',
+    Advanced: 'text-indigo-300 border-indigo-900/60 bg-indigo-950/40',
+    Expert: 'text-emerald-300 border-emerald-900/60 bg-emerald-950/40'
+  }
+
   return (
     <section>
       <SectionTitle icon={Wrench}>Tech Stack</SectionTitle>
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-3 grid gap-3 md:grid-cols-2">
         {profile.stack.map((tech) => (
-          <Badge key={tech} className="bg-slate-800 text-slate-200">
-            {tech}
-          </Badge>
+          <div key={tech.name} className="rounded-lg border border-slate-800 bg-slate-900 p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="font-medium text-slate-100">{tech.name}</p>
+              <Badge className={`border ${proficiencyStyles[tech.proficiency]}`}>{tech.proficiency}</Badge>
+            </div>
+            <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Used on projects / jobs</p>
+            <ul className="mt-1 list-disc space-y-1 pl-4 text-sm text-slate-300">
+              {tech.usedOn.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
         ))}
       </div>
     </section>
