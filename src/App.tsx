@@ -118,9 +118,21 @@ function DesignSwitcher() {
   return <div className="mx-auto mb-8 flex max-w-6xl flex-wrap gap-2">{[1, 2, 3, 4, 5].map((id) => <Link key={id} to={`/${id}`}><Button variant={pathname === `/${id}` ? 'default' : 'outline'} size="sm"><MoonStar className="h-4 w-4" /> Design {id}</Button></Link>)}</div>
 }
 
-function SectionFilterInput({ accent, value, onChange, placeholder }: { accent: Accent; value: string; onChange: (v: string) => void; placeholder: string }) {
+function SectionFilterInput({
+  accent,
+  value,
+  onChange,
+  placeholder,
+  className = 'mt-3 h-11'
+}: {
+  accent: Accent
+  value: string
+  onChange: (v: string) => void
+  placeholder: string
+  className?: string
+}) {
   return (
-    <label className={`mt-3 flex items-center gap-2 rounded-md border bg-slate-900 px-3 py-2 text-sm text-slate-300 ${accentStyles[accent].border}`}>
+    <label className={`${className} flex items-center gap-2 rounded-md border bg-slate-900 px-3 text-sm text-slate-300 ${accentStyles[accent].border}`}>
       <Search className={`h-4 w-4 ${accentStyles[accent].icon}`} />
       <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="w-full bg-transparent outline-none placeholder:text-slate-500" />
     </label>
@@ -167,8 +179,8 @@ function TechSection({ accent, filters, setFilters }: { accent: Accent; filters:
     <section>
       <SectionTitle icon={Wrench} accent={accent}>Tech Stack</SectionTitle>
       <div className="mt-3 grid gap-3 md:grid-cols-[1fr_auto]">
-        <SectionFilterInput accent={accent} value={filters.stackQuery} onChange={(v) => setFilters({ ...filters, stackQuery: v })} placeholder="Filter tech stack..." />
-        <label className={`flex items-center gap-2 rounded-md border bg-slate-900 px-3 py-2 text-sm text-slate-300 ${accentStyles[accent].border}`}><Filter className={`h-4 w-4 ${accentStyles[accent].icon}`} /><select value={filters.stackProficiency} onChange={(e) => setFilters({ ...filters, stackProficiency: e.target.value as ProficiencyFilter })} className="bg-transparent outline-none"><option value="All">All proficiency</option><option value="Beginner">Beginner</option><option value="Intermediate">Intermediate</option><option value="Advanced">Advanced</option><option value="Expert">Expert</option></select></label>
+        <SectionFilterInput accent={accent} value={filters.stackQuery} onChange={(v) => setFilters({ ...filters, stackQuery: v })} placeholder="Filter tech stack..." className="h-11" />
+        <label className={`h-11 flex items-center gap-2 rounded-md border bg-slate-900 px-3 text-sm text-slate-300 ${accentStyles[accent].border}`}><Filter className={`h-4 w-4 ${accentStyles[accent].icon}`} /><select value={filters.stackProficiency} onChange={(e) => setFilters({ ...filters, stackProficiency: e.target.value as ProficiencyFilter })} className="h-full bg-transparent outline-none"><option value="All">All proficiency</option><option value="Beginner">Beginner</option><option value="Intermediate">Intermediate</option><option value="Advanced">Advanced</option><option value="Expert">Expert</option></select></label>
       </div>
       <div className="mt-3 grid gap-3 md:grid-cols-2">
         {items.map((tech) => <div key={tech.name} className={`rounded-lg border bg-slate-900 p-3 ${accentStyles[accent].border}`}><div className="flex flex-wrap items-center justify-between gap-2"><p className="font-medium text-slate-100">{tech.name}</p><Badge className={`border ${proficiencyStyles[tech.proficiency]}`}>{tech.proficiency}</Badge></div><p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Used on projects / jobs</p><ul className="mt-1 list-disc space-y-1 pl-4 text-sm text-slate-300">{tech.usedOn.map((item) => <li key={item}>{item}</li>)}</ul></div>)}
